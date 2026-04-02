@@ -1,5 +1,6 @@
 from concurrent.futures import ProcessPoolExecutor
 
+from loguru import logger
 import numpy as np
 import torch
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -9,6 +10,12 @@ from tqdm import tqdm
 
 from block_graph import create_street_block_graph, extract_street_blocks, get_roads_from_block_data
 from classification import compute_features
+
+TQDM_DISABLE = not __import__("sys").stderr.isatty()
+
+
+def _log(message: str) -> None:
+    logger.info(f"[street-pattern] {message}")
 
 
 def _prepare_subgraph_item(item):
@@ -39,12 +46,21 @@ class BlockDataset(Dataset):
         self.blocks = []
         self.cell_ids = []
         self.all_block_graphs_with_features = []
-        print("Computing features for all subgraphs...")
+        _log("Computing features for all subgraphs...")
         items = list(block_graphs_dict.items())
         if workers > 1:
             with ProcessPoolExecutor(max_workers=workers) as executor:
                 results = executor.map(_prepare_subgraph_item, items)
-                for result in tqdm(results, total=len(items), desc="Processing subgraphs..."):
+                for result in tqdm(
+                    results,
+                    total=len(items),
+                    desc="Processing subgraphs",
+                    disable=TQDM_DISABLE,
+                    leave=False,
+                    ascii=True,
+                    dynamic_ncols=True,
+                    mininterval=0.5,
+                ):
                     if result is None:
                         continue
                     self.all_block_graphs_with_features.append(
@@ -57,7 +73,15 @@ class BlockDataset(Dataset):
                     self.blocks.append(result["block_data"])
                     self.cell_ids.append(result["cell_id"])
         else:
-            for item in tqdm(items, desc="Processing subgraphs..."):
+            for item in tqdm(
+                items,
+                desc="Processing subgraphs",
+                disable=TQDM_DISABLE,
+                leave=False,
+                ascii=True,
+                dynamic_ncols=True,
+                mininterval=0.5,
+            ):
                 cell_id, _ = item
                 try:
                     result = _prepare_subgraph_item(item)
@@ -73,12 +97,12 @@ class BlockDataset(Dataset):
                     self.blocks.append(result["block_data"])
                     self.cell_ids.append(result["cell_id"])
                 except Exception as exc:
-                    print(f"Skipping subgraph {cell_id}: {exc}")
+                    logger.warning(f"[street-pattern] Skipping subgraph {cell_id}: {exc}")
                     continue
 
-        print("Normalization...")
+        _log("Normalization...")
         self._fit_normalization()
-        print(f"Подготовлено {len(self.blocks)} блоков с корректными признаками")
+        _log(f"Prepared {len(self.blocks)} blocks with valid features")
 
     def _fit_normalization(self):
         all_node_features = []
@@ -96,8 +120,8 @@ class BlockDataset(Dataset):
             return
 
         all_node_features_np = np.array(all_node_features, dtype=np.float32)
-        print(f"Number of nodes: {len(all_node_features_np)}")
-        print(f"Number of features: {all_node_features_np.shape[1]}")
+        _log(f"Number of nodes: {len(all_node_features_np)}")
+        _log(f"Number of features: {all_node_features_np.shape[1]}")
 
         self.scaler_min_max = MinMaxScaler()
         self.scaler_standard = StandardScaler()

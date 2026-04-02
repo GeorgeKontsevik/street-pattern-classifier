@@ -1,3 +1,4 @@
+from loguru import logger
 import numpy as np
 import shapely
 import torch
@@ -10,6 +11,12 @@ from tqdm import tqdm
 
 from block_graph import get_roads_from_block_data
 from model import DynamicModel, possible_models
+
+TQDM_DISABLE = not __import__("sys").stderr.isatty()
+
+
+def _log(message: str) -> None:
+    logger.info(f"[street-pattern] {message}")
 
 
 def _build_road_context(block_data):
@@ -197,11 +204,11 @@ def classify_blocks(dataset, model_path="best_model.pth", device="cuda"):
 
     try:
         model.load_state_dict(torch.load(model_path, map_location=device, weights_only=False))
-        print("Модель загружена")
+        _log("Model loaded")
     except Exception:
         state_dict = torch.load(model_path, map_location=device, weights_only=False)
         model.load_state_dict(state_dict, strict=True)
-        print("Модель загружена частично")
+        _log("Model loaded partially")
 
     model.eval()
     predictions = {}
@@ -209,7 +216,14 @@ def classify_blocks(dataset, model_path="best_model.pth", device="cuda"):
 
     with torch.no_grad():
         for batch_idx, data in tqdm(
-            enumerate(loader), desc="Processing batches", total=len(loader)
+            enumerate(loader),
+            desc="Processing batches",
+            total=len(loader),
+            disable=TQDM_DISABLE,
+            leave=False,
+            ascii=True,
+            dynamic_ncols=True,
+            mininterval=0.5,
         ):
             data["gnn0"].x = data["gnn0"].x.to(device)
             data["gnn0"].edge_index = data["gnn0"].edge_index.to(device)

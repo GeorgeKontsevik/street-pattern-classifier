@@ -16,7 +16,7 @@ TQDM_DISABLE = not __import__("sys").stderr.isatty()
 
 
 def _log(message: str) -> None:
-    logger.info(f"[street-pattern] {message}")
+    logger.bind(tag="[street-pattern]").debug(message)
 
 
 def _build_road_context(block_data):

@@ -15,7 +15,7 @@ TQDM_DISABLE = not __import__("sys").stderr.isatty()
 
 
 def _log(message: str) -> None:
-    logger.info(f"[street-pattern] {message}")
+    logger.bind(tag="[street-pattern]").debug(message)
 
 
 def _prepare_subgraph_item(item):
@@ -97,7 +97,7 @@ class BlockDataset(Dataset):
                     self.blocks.append(result["block_data"])
                     self.cell_ids.append(result["cell_id"])
                 except Exception as exc:
-                    logger.warning(f"[street-pattern] Skipping subgraph {cell_id}: {exc}")
+                    logger.bind(tag="[street-pattern]").warning(f"Skipping subgraph {cell_id}: {exc}")
                     continue
 
         _log("Normalization...")

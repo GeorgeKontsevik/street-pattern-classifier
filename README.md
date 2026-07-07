@@ -1,5 +1,7 @@
 # street-pattern-classifier
 
+[![OSA-improved](https://img.shields.io/badge/improved%20by-OSA-yellow)](https://github.com/aimclub/OSA)
+
 Block-graph street-pattern classifier. It builds graph/morphology features and predicts interpretable street-pattern labels.
 
 ## System Map
@@ -35,3 +37,4 @@ No standalone publication tracked; used by the street-pattern dissertation exper
 ## Next Steps / Heuristics
 
 Heuristic: keep labels interpretable and stable across cities. Prefer a smaller class set over fragile fine-grained taxonomy.
+

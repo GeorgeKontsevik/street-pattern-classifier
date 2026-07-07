@@ -1,19 +1,20 @@
 # street-pattern-classifier
 
-Classifies urban street-pattern graph samples.
+Block-graph street-pattern classifier. It builds graph/morphology features and predicts interpretable street-pattern labels.
 
-## Scheme
+## System Map
 
 ```mermaid
 flowchart LR
-    A[Inputs] --> B[Run: usage.ipynb]
-    B --> C[Checked outputs]
-    C --> D[Paper / thesis use]
+    BLOCKS[urban blocks] --> GRAPH[block graph]
+    GRAPH --> FEAT[morphology features]
+    FEAT --> MODEL[classifier]
+    MODEL --> LABELS[street-pattern labels]
 ```
 
-## Main Result
+## Main Image
 
-![Main result](docs/readme_result.svg)
+![Street-pattern classifier workflow](docs/readme_project_map.svg)
 
 ## Run
 
@@ -25,14 +26,12 @@ Human:
 pip install -r requirements.txt && jupyter notebook usage.ipynb
 ```
 
-Agent:
-
-Reuse classifier outputs; do not retrain unless dataset/model version is explicit.
+Agent: inspect class balance and map samples, not only aggregate accuracy; mislabeled morphology is worse than missing labels.
 
 ## Publication
 
-No standalone publication tracked.
+No standalone publication tracked; used by the street-pattern dissertation experiments.
 
 ## Next Steps / Heuristics
 
-Heuristic: top-1 classes are useful summaries, but probability mixtures are better for maps.
+Heuristic: keep labels interpretable and stable across cities. Prefer a smaller class set over fragile fine-grained taxonomy.

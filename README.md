@@ -12,9 +12,9 @@ flowchart LR
     MODEL --> LABELS[street-pattern labels]
 ```
 
-## Main Image
+## Main Result
 
-![Street-pattern classifier workflow](docs/readme_project_map.svg)
+![Street-pattern experiment atlas](docs/readme_main_result.png)
 
 ## Run
 
@@ -30,7 +30,7 @@ Agent: inspect class balance and map samples, not only aggregate accuracy; misla
 
 ## Publication
 
-No standalone publication tracked; used by the street-pattern dissertation experiments.
+No standalone publication tracked; used by the street-pattern dissertation experiments. The README result image is copied from the downstream street-pattern experiment artifact.
 
 ## Next Steps / Heuristics
 
